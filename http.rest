@@ -1,0 +1,37 @@
+@baseUrl = https://localhost:8000/api
+@authToken = Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1c2VySWQiOiI5ODRlYjllOS00NWJhLTQyOWUtOGRiZi1hNzg2NjRiZTJhOTMiLCJlbWFpbCI6Impvc2VAbWFpbC5jb20uYnIiLCJmaXJzdE5hbWUiOiJKb3NlIiwibGFzdE5hbWUiOiJTaWx2YSJ9.mFF3FFgKO7EPqL2hJ3G43JeED1JbWmtFzW6DVnKTgNzfO94LDh--6ofnyylNt5UVr7zhCBMgS_sOGhCAYzKLPeAd2NF0n-RNeUY7QRfZgyV_e4xQ6V11b81dPgHHZ8ps26psOeep0pxK621Q4ffmbxy99RwdQ6juHoKlmMVVayalEkHPpbZ3d2Fdzg1gFZeSGcdUlHUW2xrTiHsMGLHJC3Dr_YZjvjxlXd09Kb8A_5E25_6xgRyqWHVOOtmqWszcHtYXmije3PujlR0xx7XhL1WbPHdhvkQAYkWvsHE2gtfXOOdliq_TDN999GkSRA5CFV3bbew6thrM-sETRr6sYcZkaTXFOcXiaKwji-fqI1JyI32MYyPMqFkpw08-F4BbssmiCaXRMqRXIcV52cyjSovObVArrB0G_rGcKtNlj8c4aHJQUiALyqalZvFlrIcq_Hsrw7TubJpWLPRfCJUmdC4Pt5EsAtB1LHMjY54vdq9Jstf8e7yAnffhcFJHQC-uorpPIXwfh_zy38cc5k19LY6FfndRvzMzqqvw8IOpqmnmgfmjWJH5WploY59z49zfFBaf7nDTtnYZo7a3u_E99adIsPMnwL6Zi-Qc3bpY63irYsRdlQQtBdJGfcP5_v3ivJuQ5Vq-JkNAmJpgphxe9XvnZJmwdT4HnOE1fLfeCLI
+
+GET {{baseUrl}}/actuator/info
+
+###
+
+POST {{baseUrl}}/auth/login
+content-type: application/ld+json
+
+{
+    "email": "jose@mail.com.br",
+    "password": "p@ssw0rd"
+}
+
+###
+
+POST {{baseUrl}}/auth/signup
+content-type: application/ld+json
+
+{
+    "firstName": "Jose",
+    "lastName": "Silva",
+    "email": "jose@mail.com.br",
+    "password": "p@ssw0rd",
+    "passwordConfirm": "p@ssw0rd"
+}
+
+###
+
+GET {{baseUrl}}/users
+Authorization: {{authToken}}
+
+###
+
+GET {{baseUrl}}/users/984eb9e9-45ba-429e-8dbf-a78664be2a93
+Authorization: {{authToken}}

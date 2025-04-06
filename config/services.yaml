@@ -1,0 +1,48 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+    .container.dumper.inline_factories: true
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        bind:
+            'string $jwtPrivateKey': '%env(resolve:JWT_PRIVATE_KEY)%'
+            'string $jwtPublicKey': '%env(resolve:JWT_PUBLIC_KEY)%'
+
+    _instanceof:
+
+        # Messenger handlers
+        App\Common\Application\Query\QueryHandler:
+            tags:
+                - { name: 'messenger.message_handler', bus: 'query.bus' }
+
+        App\Common\Application\Command\CommandHandler:
+            tags:
+                - { name: 'messenger.message_handler', bus: 'command.bus' }
+
+    # Common
+    App\Common\:
+        resource: '%kernel.project_dir%/src/Common/'
+        exclude:
+            - '%kernel.project_dir%/src/Common/Infrastructure/Symfony/Kernel.php'
+
+    # Authentication
+    App\Authentication\:
+        resource: '%kernel.project_dir%/src/Authentication/'
+
+    # User
+    App\User\:
+        resource: '%kernel.project_dir%/src/User/'
+
+    # Messaging
+    App\Messaging\:
+        resource: '%kernel.project_dir%/src/Messaging/'
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones

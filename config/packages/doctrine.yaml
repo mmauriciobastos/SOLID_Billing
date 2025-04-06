@@ -1,0 +1,97 @@
+doctrine:
+    dbal:
+        dbname: '%env(resolve:DATABASE_NAME)%'
+        host: '%env(resolve:DATABASE_HOST)%'
+        port: '%env(resolve:DATABASE_PORT)%'
+        user: '%env(resolve:DATABASE_USER)%'
+        password: '%env(resolve:DATABASE_PASSWORD)%'
+        driver: '%env(resolve:DATABASE_DRIVER)%'
+        server_version: '%env(resolve:DATABASE_SERVER_VERSION)%'
+
+        # url: '%env(resolve:DATABASE_URL)%'
+
+        types:
+            # Common
+            datetime: App\Common\Infrastructure\Doctrine\Type\DateTimeType
+            firstname: App\Common\Infrastructure\Doctrine\Type\FirstNameType
+            lastname: App\Common\Infrastructure\Doctrine\Type\LastNameType
+            email: App\Common\Infrastructure\Doctrine\Type\EmailType
+
+            # Authentication
+            username: App\Authentication\Infrastructure\Doctrine\Type\UsernameType
+            hashed_password: App\Authentication\Infrastructure\Doctrine\Type\HashedPasswordType
+
+            # User
+            user_id: App\User\Infrastructure\Doctrine\Type\UserIdType
+            user_status: App\User\Infrastructure\Doctrine\Type\UserStatusType
+
+            # Messaging
+            conversation_id: App\Messaging\Infrastructure\Doctrine\Type\ConversationIdType
+            participant_id: App\Messaging\Infrastructure\Doctrine\Type\ParticipantIdType
+            participant_name: App\Messaging\Infrastructure\Doctrine\Type\ParticipantNameType
+            message_id: App\Messaging\Infrastructure\Doctrine\Type\MessageIdType
+            message_content: App\Messaging\Infrastructure\Doctrine\Type\MessageContentType
+
+        profiling_collect_backtrace: '%kernel.debug%'
+        use_savepoints: true
+
+    orm:
+        auto_generate_proxy_classes: true
+        enable_lazy_ghost_objects: true
+        report_fields_where_declared: true
+        validate_xml_mapping: true
+        naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+        #identity_generation_preferences:
+        #    Doctrine\DBAL\Platforms\MariaDBPlatform: 'uuid'
+        auto_mapping: true
+        mappings:
+            Authentication:
+                is_bundle: false
+                type: xml
+                dir: '%kernel.project_dir%/src/Authentication/Infrastructure/Doctrine/Mapping'
+                prefix: 'App\Authentication\Domain\Entity'
+
+            User:
+                is_bundle: false
+                type: xml
+                dir: '%kernel.project_dir%/src/User/Infrastructure/Doctrine/Mapping'
+                prefix: 'App\User\Domain\Entity'
+
+            Messaging:
+                is_bundle: false
+                type: xml
+                dir: '%kernel.project_dir%/src/Messaging/Infrastructure/Doctrine/Mapping'
+                prefix: 'App\Messaging\Domain\Entity'
+        controller_resolver:
+            auto_mapping: false
+
+when@test:
+    doctrine:
+        dbal:
+            driver: '%env(resolve:DATABASE_DRIVER)%'
+            server_version: '%env(resolve:DATABASE_SERVER_VERSION)%'
+            # "TEST_TOKEN" is typically set by ParaTest
+            dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+
+when@prod:
+    doctrine:
+        dbal:
+            driver: '%env(resolve:DATABASE_DRIVER)%'
+            server_version: '%env(resolve:DATABASE_SERVER_VERSION)%'
+        orm:
+            auto_generate_proxy_classes: false
+            proxy_dir: '%kernel.build_dir%/doctrine/orm/Proxies'
+            query_cache_driver:
+                type: pool
+                pool: doctrine.system_cache_pool
+            result_cache_driver:
+                type: pool
+                pool: doctrine.result_cache_pool
+
+    framework:
+        cache:
+            pools:
+                doctrine.result_cache_pool:
+                    adapter: cache.app
+                doctrine.system_cache_pool:
+                    adapter: cache.system
