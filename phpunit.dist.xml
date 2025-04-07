@@ -14,7 +14,7 @@
         <server name="APP_ENV" value="test" force="true" />
         <server name="SHELL_VERBOSITY" value="-1" />
         <server name="SYMFONY_PHPUNIT_REMOVE" value="" />
-        <server name="SYMFONY_PHPUNIT_VERSION" value="10.5" />
+        <server name="SYMFONY_PHPUNIT_VERSION" value="11.5" />
     </php>
 
     <testsuites>
@@ -29,6 +29,21 @@
         </include>
     </source>
 
+    <coverage processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+    </coverage>
+
+    <listeners>
+        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" />
+    </listeners>
+
     <extensions>
+        <bootstrap class="DG\BypassFinals\PHPUnitExtension">
+            <parameter name="bypassFinal" value="true"/>
+            <parameter name="bypassReadOnly" value="false"/>
+            <parameter name="cacheDirectory" value="./cache"/>
+        </bootstrap>
     </extensions>
 </phpunit>
