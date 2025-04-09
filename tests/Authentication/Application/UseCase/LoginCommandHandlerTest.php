@@ -8,23 +8,25 @@ use App\Authentication\Application\DTO\AuthTokenDTO;
 use App\Authentication\Application\Service\AuthTokenCreator;
 use App\Authentication\Application\UseCase\Login\LoginCommand;
 use App\Authentication\Application\UseCase\Login\LoginCommandHandler;
-use App\Authentication\Domain\Entity\UserCredential;
+use App\Authentication\Domain\Entity\ClientCredential;
 use App\Authentication\Domain\Exception\InvalidCredentials;
-use App\Authentication\Domain\Repository\UserCredentialRepository;
+use App\Authentication\Domain\Repository\ClientCredentialRepository;
 use App\Authentication\Domain\Service\PasswordHasher;
 use App\Authentication\Domain\ValueObject\HashedPassword;
 use App\Authentication\Domain\ValueObject\Password;
 use App\Authentication\Domain\ValueObject\Username;
 use App\Common\Application\Query\QueryBus;
-use App\User\Application\DTO\UserDTO;
-use App\User\Application\UseCase\GetUserById\GetUserByIdQuery;
-use App\User\Domain\ValueObject\UserId;
+use App\Common\Domain\ValueObject\Email;
+use App\Common\Domain\ValueObject\FirstName;
+use App\Common\Domain\ValueObject\LastName;
+use App\ClientManagement\Application\DTO\ClientDTO;
+use App\ClientManagement\Application\UseCase\GetClientById\GetClientByIdQuery;
 use PHPUnit\Framework\TestCase;
 
 final class LoginCommandHandlerTest extends TestCase
 {
     private $queryBus;
-    private $userCredentialRepository;
+    private $clientCredentialRepository;
     private $passwordHasher;
     private $authTokenCreator;
     private LoginCommandHandler $handler;
@@ -34,13 +36,13 @@ final class LoginCommandHandlerTest extends TestCase
         \DG\BypassFinals::debugInfo();
 
         $this->queryBus = $this->createMock(QueryBus::class);
-        $this->userCredentialRepository = $this->createMock(UserCredentialRepository::class);
+        $this->clientCredentialRepository = $this->createMock(ClientCredentialRepository::class);
         $this->passwordHasher = $this->createMock(PasswordHasher::class);
         $this->authTokenCreator = $this->createMock(AuthTokenCreator::class);
 
         $this->handler = new LoginCommandHandler(
             $this->queryBus,
-            $this->userCredentialRepository,
+            $this->clientCredentialRepository,
             $this->passwordHasher,
             $this->authTokenCreator
         );
@@ -48,7 +50,6 @@ final class LoginCommandHandlerTest extends TestCase
 
     public function testValidLogin(): void
     {
-        $userId = UserId::generate();
         $firstName = 'John';
         $lastName = 'Doe';
         $email = 'john@example.com';
@@ -56,48 +57,54 @@ final class LoginCommandHandlerTest extends TestCase
         $password = 'password123';
         $authToken = AuthTokenDTO::fromString('token123');
 
-        $userCredential = $this->createMock(UserCredential::class);
+        $clientCredential = $this->createMock(ClientCredential::class);
+
+        $client = \App\ClientManagement\Domain\Entity\Client::create(
+            firstName: FirstName::fromString($firstName),
+            lastName: LastName::fromString($lastName),
+            email: Email::fromString($email)
+        );
+        $clientDTO = ClientDTO::fromEntity($client);
+        $clientCredential->method('clientId')->willReturn($client->id());
+
         $hashedPassword = $this->createMock(HashedPassword::class);
-        $userCredential->method('hashedPassword')->willReturn($hashedPassword);
-        $userCredential->method('userId')->willReturn($userId);
+        $clientCredential->method('hashedPassword')->willReturn($hashedPassword);
 
-        $userDTO = $this->createMock(UserDTO::class);
-
-        $this->userCredentialRepository
+        $this->clientCredentialRepository
             ->method('getByUsername')
             ->with(Username::fromString($username))
-            ->willReturn($userCredential);
+            ->willReturn($clientCredential);
 
         $this->passwordHasher
             ->method('verify')
-            ->with('hashed_password', Password::fromString($password))
+            ->with($hashedPassword, Password::fromString($password))
             ->willReturn(true);
 
         $this->queryBus
             ->method('ask')
-            ->with(new GetUserByIdQuery($userId->value()))
-            ->willReturn($userDTO);
+            ->with(new GetClientByIdQuery((string) $clientCredential->clientId()))
+            ->willReturn($clientDTO);
 
         $this->authTokenCreator
-            ->method('createFromUserDTO')
-            ->with($userDTO)
+            ->method('createFromClientDTO')
+            ->with($clientDTO)
             ->willReturn($authToken);
 
         $command = new LoginCommand($username, $password);
         $result = $this->handler->__invoke($command);
 
-        $this->assertSame($authToken, $result);
+        $this->assertEquals($authToken, $result);
     }
 
-    public function testInvalidUsername(): void
+    public function testInvalidClientname(): void
     {
-        $this->userCredentialRepository
-            ->method('getByUsername')
+        $this->clientCredentialRepository
+            ->method('getByClientname')
             ->willThrowException(new \Exception());
 
         $this->expectException(InvalidCredentials::class);
 
-        $command = new LoginCommand('invaliduser', 'password123');
+        $command = new LoginCommand('invalidclient', 'password123');
         $this->handler->__invoke($command);
     }
 
@@ -106,15 +113,15 @@ final class LoginCommandHandlerTest extends TestCase
         $username = 'john@example.com';
         $password = 'wrongpassword';
 
-        $userCredential = $this->createMock(UserCredential::class);
+        $clientCredential = $this->createMock(ClientCredential::class);
         $hashedPassword = $this->createMock(HashedPassword::class);
 
-        $userCredential->method('hashedPassword')->willReturn($hashedPassword);
+        $clientCredential->method('hashedPassword')->willReturn($hashedPassword);
 
-        $this->userCredentialRepository
+        $this->clientCredentialRepository
             ->method('getByUsername')
-            ->with(Username::fromString($username))
-            ->willReturn($userCredential);
+            ->with(UserName::fromString($username))
+            ->willReturn($clientCredential);
 
         $this->passwordHasher
             ->method('verify')
