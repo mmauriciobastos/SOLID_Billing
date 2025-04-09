@@ -40,6 +40,8 @@
     "require-dev": {
         "dg/bypass-finals": "^1.9",
         "phpunit/phpunit": "*",
+        "symfony/browser-kit": "7.2.*",
+        "symfony/css-selector": "7.2.*",
         "symfony/phpunit-bridge": "*"
     },
     "config": {
