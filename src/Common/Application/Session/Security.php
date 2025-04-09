@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Common\Application\Session;
 
-use App\Authentication\Application\DTO\AuthUserDTO;
+use App\Authentication\Application\DTO\AuthClientDTO;
 
 interface Security
 {
     public function isAuthenticated(): bool;
 
-    public function connectedUser(): ?AuthUserDTO;
+    public function connectedClient(): ?AuthClientDTO;
 }

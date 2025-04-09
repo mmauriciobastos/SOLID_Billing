@@ -6,25 +6,25 @@ namespace App\Authentication\Application\UseCase\Signup;
 
 use App\Authentication\Application\DTO\AuthTokenDTO;
 use App\Authentication\Application\Service\AuthTokenCreator;
-use App\Authentication\Domain\Entity\UserCredential;
+use App\Authentication\Domain\Entity\ClientCredential;
 use App\Authentication\Domain\Exception\CredentialNotFoundForUsername;
 use App\Authentication\Domain\Exception\UsernameAlreadyUsed;
-use App\Authentication\Domain\Repository\UserCredentialRepository;
+use App\Authentication\Domain\Repository\ClientCredentialRepository;
 use App\Authentication\Domain\Service\PasswordHasher;
 use App\Authentication\Domain\ValueObject\Password;
 use App\Authentication\Domain\ValueObject\Username;
 use App\Common\Application\Command\CommandBus;
 use App\Common\Application\Command\CommandHandler;
-use App\User\Application\DTO\UserDTO;
-use App\User\Application\UseCase\CreateUser\CreateUserCommand;
-use App\User\Domain\ValueObject\UserId;
+use App\ClientManagement\Application\DTO\ClientDTO;
+use App\ClientManagement\Application\UseCase\CreateClient\CreateClientCommand;
+use App\ClientManagement\Domain\ValueObject\ClientId;
 
 final class SignupCommandHandler implements CommandHandler
 {
     public function __construct(
         private readonly CommandBus $commandBus,
         private readonly PasswordHasher $passwordHasher,
-        private readonly UserCredentialRepository $userCredentialRepository,
+        private readonly ClientCredentialRepository $clientCredentialRepository,
         private readonly AuthTokenCreator $authTokenCreator,
     ) {
     }
@@ -37,22 +37,22 @@ final class SignupCommandHandler implements CommandHandler
         $this->ensurePasswordConfirmIsValid(Password::fromString($command->password), Password::fromString($command->passwordConfirm));
         $this->ensureUsernameIsAvailable(Username::fromString($command->email));
 
-        // User is created first for generate UserId to use in creating of credentials
-        $userDTO = $this->createUser(
+        // Client is created first for generate ClientId to use in creating of credentials
+        $clientDTO = $this->createClient(
             firstName: $command->firstName,
             lastName: $command->lastName,
             email: $command->email,
         );
 
-        $userCredential = UserCredential::create(
-            userId: UserId::fromString($userDTO->id),
+        $clientCredential = ClientCredential::create(
+            clientId: ClientId::fromString($clientDTO->id),
             username: Username::fromString($command->email),
             hashedPassword: $this->passwordHasher->hash(Password::fromString($command->password)),
         );
 
-        $this->userCredentialRepository->add($userCredential);
+        $this->clientCredentialRepository->add($clientCredential);
 
-        return $this->authTokenCreator->createFromUserDTO($userDTO);
+        return $this->authTokenCreator->createFromClientDTO($clientDTO);
     }
 
     private function ensurePasswordConfirmIsValid(Password $password, Password $passwordConfirm): void
@@ -68,7 +68,7 @@ final class SignupCommandHandler implements CommandHandler
     private function ensureUsernameIsAvailable(Username $username): void
     {
         try {
-            $this->userCredentialRepository->getByUsername($username);
+            $this->clientCredentialRepository->getByUsername($username);
         } catch (CredentialNotFoundForUsername) {
             return;
         }
@@ -76,11 +76,11 @@ final class SignupCommandHandler implements CommandHandler
         throw new UsernameAlreadyUsed($username);
     }
 
-    private function createUser(string $firstName, string $lastName, string $email): UserDTO
+    private function createClient(string $firstName, string $lastName, string $email): ClientDTO
     {
         return $this->commandBus
             ->dispatch(
-                new CreateUserCommand(
+                new CreateClientCommand(
                     firstName: $firstName,
                     lastName: $lastName,
                     email: $email,

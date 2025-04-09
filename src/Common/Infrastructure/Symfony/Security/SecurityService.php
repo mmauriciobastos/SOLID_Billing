@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Common\Infrastructure\Symfony\Security;
 
-use App\Authentication\Application\DTO\AuthUserDTO;
+use App\Authentication\Application\DTO\AuthClientDTO;
 use App\Common\Application\Session\Security;
 use Symfony\Bundle\SecurityBundle\Security as SecurityComponent;
-use App\Common\UserInterface\Security\AuthUser;
+use App\Common\UserInterface\Security\AuthClient;
 
 final class SecurityService implements Security
 {
@@ -18,17 +18,17 @@ final class SecurityService implements Security
 
     public function isAuthenticated(): bool
     {
-        return null !== $this->connectedUser();
+        return null !== $this->connectedClient();
     }
 
-    public function connectedUser(): ?AuthUserDTO
+    public function connectedClient(): ?AuthClientDTO
     {
-        $authenticatedUser = $this->security->getUser();
+        $authenticatedClient = $this->security->getUser();
 
-        if (!$authenticatedUser instanceof AuthUser) {
+        if (!$authenticatedClient instanceof AuthClient) {
             return null;
         }
 
-        return $authenticatedUser->authUserDTO();
+        return $authenticatedClient->authClientDTO();
     }
 }

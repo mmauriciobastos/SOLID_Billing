@@ -36,9 +36,9 @@ services:
     App\Authentication\:
         resource: '%kernel.project_dir%/src/Authentication/'
 
-    # User
-    App\User\:
-        resource: '%kernel.project_dir%/src/User/'
+    # ClientManagement
+    App\ClientManagement\:
+        resource: '%kernel.project_dir%/src/ClientManagement/'
 
     # Messaging
     App\Messaging\:

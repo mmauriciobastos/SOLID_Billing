@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Messaging\Domain\Entity;
 
-use App\Authentication\Application\DTO\AuthUserDTO;
+use App\Authentication\Application\DTO\AuthClientDTO;
 use App\Common\Domain\Entity\AggregateRoot;
 use App\Common\Domain\ValueObject\DateTime;
 use App\Messaging\Domain\Exception\NotEnoughParticipants;
 use App\Messaging\Domain\Exception\ParticipantNotFoundInConversation;
-use App\Messaging\Domain\Exception\UserIsNotParticipantOfConversation;
+use App\Messaging\Domain\Exception\ClientIsNotParticipantOfConversation;
 use App\Messaging\Domain\ValueObject\ConversationId;
 use App\Messaging\Domain\ValueObject\MessageContent;
-use App\User\Application\DTO\UserDTO;
-use App\User\Domain\ValueObject\UserId;
+use App\ClientManagement\Application\DTO\ClientDTO;
+use App\ClientManagement\Domain\ValueObject\ClientId;
 use Carbon\Carbon;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -33,30 +33,30 @@ class Conversation extends AggregateRoot
     private Collection $participants;
 
     /**
-     * @param UserDTO[] $usersDTOs
+     * @param ClientDTO[] $clientsDTOs
      */
-    private function __construct(DateTime $createdAt, array $usersDTOs)
+    private function __construct(DateTime $createdAt, array $clientsDTOs)
     {
-        $this->ensureHasEnoughParticipants($usersDTOs);
+        $this->ensureHasEnoughParticipants($clientsDTOs);
 
         $this->id = ConversationId::generate();
         $this->createdAt = $createdAt;
         $this->messages = new ArrayCollection();
         $this->participants = new ArrayCollection();
 
-        foreach ($usersDTOs as $userDTO) {
-            $this->addParticipant(Participant::create($userDTO, $this));
+        foreach ($clientsDTOs as $clientDTO) {
+            $this->addParticipant(Participant::create($clientDTO, $this));
         }
     }
 
     /**
-     * @param UserDTO[] $usersDTOs
+     * @param ClientDTO[] $clientsDTOs
      */
-    public static function create(DateTime $createdAt, array $usersDTOs): self
+    public static function create(DateTime $createdAt, array $clientsDTOs): self
     {
         return new self(
             createdAt: $createdAt,
-            usersDTOs: $usersDTOs,
+            clientsDTOs: $clientsDTOs,
         );
     }
 
@@ -104,16 +104,16 @@ class Conversation extends AggregateRoot
         return $this->participants->toArray();
     }
 
-    public function participantFromAuthUser(AuthUserDTO $authUser): Participant
+    public function participantFromAuthClient(AuthClientDTO $authClient): Participant
     {
         foreach ($this->participants as $participant) {
-            if ($participant->userId()->equals($authUser->userId)) {
+            if ($participant->clientId()->equals($authClient->clientId)) {
                 return $participant;
             }
         }
 
-        throw new UserIsNotParticipantOfConversation(
-            userId: UserId::fromString($authUser->userId),
+        throw new ClientIsNotParticipantOfConversation(
+            clientId: ClientId::fromString($authClient->clientId),
             conversationId: $this->id(),
         );
     }
@@ -125,10 +125,10 @@ class Conversation extends AggregateRoot
         }
     }
 
-    private function ensureHasEnoughParticipants(array $users): void
+    private function ensureHasEnoughParticipants(array $clients): void
     {
-        if (count($users) < self::MIN_PARTICIPANTS) {
-            throw new NotEnoughParticipants(self::MIN_PARTICIPANTS, count($users));
+        if (count($clients) < self::MIN_PARTICIPANTS) {
+            throw new NotEnoughParticipants(self::MIN_PARTICIPANTS, count($clients));
         }
     }
 }

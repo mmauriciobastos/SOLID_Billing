@@ -22,8 +22,8 @@ doctrine:
             hashed_password: App\Authentication\Infrastructure\Doctrine\Type\HashedPasswordType
 
             # User
-            user_id: App\User\Infrastructure\Doctrine\Type\UserIdType
-            user_status: App\User\Infrastructure\Doctrine\Type\UserStatusType
+            client_id: App\ClientManagement\Infrastructure\Doctrine\Type\ClientIdType
+            client_status: App\ClientManagement\Infrastructure\Doctrine\Type\ClientStatusType
 
             # Messaging
             conversation_id: App\Messaging\Infrastructure\Doctrine\Type\ConversationIdType
@@ -42,7 +42,7 @@ doctrine:
         validate_xml_mapping: true
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
         #identity_generation_preferences:
-        #    Doctrine\DBAL\Platforms\MariaDBPlatform: 'uuid'
+        #    Doctrine\DBAL\Platforms\PostgreSQLPlatform: 'uuid'
         auto_mapping: true
         mappings:
             Authentication:
@@ -54,8 +54,8 @@ doctrine:
             User:
                 is_bundle: false
                 type: xml
-                dir: '%kernel.project_dir%/src/User/Infrastructure/Doctrine/Mapping'
-                prefix: 'App\User\Domain\Entity'
+                dir: '%kernel.project_dir%/src/ClientManagement/Infrastructure/Doctrine/Mapping'
+                prefix: 'App\ClientManagement\Domain\Entity'
 
             Messaging:
                 is_bundle: false

@@ -6,7 +6,7 @@ security:
     providers:
         jwt_user_provider:
             # https://symfony.com/doc/current/security.html#loading-the-user-from-a-database
-            id: App\Common\UserInterface\Security\JWTUserProvider
+            id: App\Common\UserInterface\Security\JWTClientProvider
         #users_in_memory: { memory: null }
     firewalls:
         dev:

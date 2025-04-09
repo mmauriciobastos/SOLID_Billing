@@ -18,9 +18,9 @@ final class SearchConversationsPaginatedQueryHandler implements QueryHandler
 
     public function __invoke(SearchConversationsPaginatedQuery $query): array
     {
-        $users = $this->conversationRepository->search($query->page, $query->itemsPerPage);
+        $clients = $this->conversationRepository->search($query->page, $query->itemsPerPage);
 
-        return $this->mapConversationsToConversationsDTOs($users);
+        return $this->mapConversationsToConversationsDTOs($clients);
     }
 
     /**

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Authentication\Application\Service;
 
 use App\Authentication\Application\DTO\AuthTokenDTO;
-use App\User\Application\DTO\UserDTO;
+use App\ClientManagement\Application\DTO\ClientDTO;
 
 final class AuthTokenCreator
 {
@@ -14,13 +14,13 @@ final class AuthTokenCreator
     ) {
     }
 
-    public function createFromUserDTO(UserDTO $userDTO): AuthTokenDTO
+    public function createFromClientDTO(ClientDTO $clientDTO): AuthTokenDTO
     {
         $tokenPayload = [
-            'userId' => $userDTO->id,
-            'email' => $userDTO->email,
-            'firstName' => $userDTO->firstName,
-            'lastName' => $userDTO->lastName,
+            'clientId' => $clientDTO->id,
+            'email' => $clientDTO->email,
+            'firstName' => $clientDTO->firstName,
+            'lastName' => $clientDTO->lastName,
         ];
 
         return AuthTokenDTO::fromString($this->tokenEncoder->encode($tokenPayload));

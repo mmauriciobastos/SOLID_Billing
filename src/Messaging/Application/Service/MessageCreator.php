@@ -17,7 +17,7 @@ final class MessageCreator
 
     public function create(Conversation $conversation, MessageContent $messageContent): void
     {
-        $participant = $conversation->participantFromAuthUser($this->security->connectedUser());
+        $participant = $conversation->participantFromAuthClient($this->security->connectedClient());
 
         $conversation->postMessage($participant, $messageContent);
     }

@@ -7,20 +7,20 @@ namespace App\Authentication\Application\UseCase\Login;
 use App\Authentication\Application\DTO\AuthTokenDTO;
 use App\Authentication\Application\Service\AuthTokenCreator;
 use App\Authentication\Domain\Exception\InvalidCredentials;
-use App\Authentication\Domain\Repository\UserCredentialRepository;
+use App\Authentication\Domain\Repository\ClientCredentialRepository;
 use App\Authentication\Domain\Service\PasswordHasher;
 use App\Authentication\Domain\ValueObject\Password;
 use App\Authentication\Domain\ValueObject\Username;
 use App\Common\Application\Command\CommandHandler;
 use App\Common\Application\Query\QueryBus;
-use App\User\Application\DTO\UserDTO;
-use App\User\Application\UseCase\GetUserById\GetUserByIdQuery;
+use App\ClientManagement\Application\DTO\ClientDTO;
+use App\ClientManagement\Application\UseCase\GetClientById\GetClientByIdQuery;
 
 final class LoginCommandHandler implements CommandHandler
 {
     public function __construct(
         private readonly QueryBus $queryBus,
-        private readonly UserCredentialRepository $userCredentialRepository,
+        private readonly ClientCredentialRepository $clientCredentialRepository,
         private readonly PasswordHasher $passwordHasher,
         private readonly AuthTokenCreator $authTokenCreator,
     ) {
@@ -32,23 +32,23 @@ final class LoginCommandHandler implements CommandHandler
     public function __invoke(LoginCommand $command): AuthTokenDTO
     {
         try {
-            $userCredential = $this->userCredentialRepository->getByUsername(Username::fromString($command->username));
+            $clientCredential = $this->clientCredentialRepository->getByUsername(Username::fromString($command->username));
         } catch (\Exception) {
             throw new InvalidCredentials();
         }
 
-        if (!$this->passwordHasher->verify($userCredential->hashedPassword(), Password::fromString($command->password))) {
+        if (!$this->passwordHasher->verify($clientCredential->hashedPassword(), Password::fromString($command->password))) {
             throw new InvalidCredentials();
         }
 
-        /** @var UserDTO $userDTO */
-        $userDTO = $this->queryBus
+        /** @var ClientDTO $clientDTO */
+        $clientDTO = $this->queryBus
             ->ask(
-                new GetUserByIdQuery(
-                    userId: (string) $userCredential->userId(),
+                new GetClientByIdQuery(
+                    clientId: (string) $clientCredential->clientId(),
                 )
             );
 
-        return $this->authTokenCreator->createFromUserDTO($userDTO);
+        return $this->authTokenCreator->createFromClientDTO($clientDTO);
     }
 }

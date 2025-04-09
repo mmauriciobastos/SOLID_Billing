@@ -7,31 +7,31 @@ namespace App\Messaging\Domain\Entity;
 use App\Messaging\Domain\Exception\ConversationAlreadyArchivedByParticipant;
 use App\Messaging\Domain\ValueObject\ParticipantId;
 use App\Messaging\Domain\ValueObject\ParticipantName;
-use App\User\Application\DTO\UserDTO;
-use App\User\Domain\ValueObject\UserId;
+use App\ClientManagement\Application\DTO\ClientDTO;
+use App\ClientManagement\Domain\ValueObject\ClientId;
 
 class Participant
 {
     private ParticipantId $id;
     private ParticipantName $name;
-    private UserId $userId;
+    private ClientId $clientId;
     private bool $isArchived;
 
     private function __construct(
-        private readonly UserDTO $userDTO,
+        private readonly ClientDTO $clientDTO,
         private readonly Conversation $conversation,
     ) {
         $this->id = ParticipantId::generate();
-        $this->userId = UserId::fromString($this->userDTO->id);
-        $this->name = ParticipantName::fromUserDTO($this->userDTO);
+        $this->clientId = ClientId::fromString($this->clientDTO->id);
+        $this->name = ParticipantName::fromClientDTO($this->clientDTO);
         $this->isArchived = false;
     }
 
     public static function create(
-        UserDTO $userDTO,
+        ClientDTO $clientDTO,
         Conversation $conversation,
     ): self {
-        return new self($userDTO, $conversation);
+        return new self($clientDTO, $conversation);
     }
 
     /**
@@ -49,9 +49,9 @@ class Participant
         return $this->id;
     }
 
-    public function userId(): UserId
+    public function clientId(): ClientId
     {
-        return $this->userId;
+        return $this->clientId;
     }
 
     public function name(): ParticipantName
