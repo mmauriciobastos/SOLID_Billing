@@ -16,7 +16,7 @@ use App\Authentication\Domain\ValueObject\Username;
 use App\Common\Application\Command\CommandBus;
 use App\Common\Application\Command\CommandHandler;
 use App\ClientManagement\Application\DTO\ClientDTO;
-use App\ClientManagement\Application\UseCase\CreateClient\CreateClientCommand;
+use App\ClientManagement\Application\UseCase\RegisterClient\RegisterClientCommand;
 use App\ClientManagement\Domain\ValueObject\ClientId;
 
 final class SignupCommandHandler implements CommandHandler
@@ -80,7 +80,7 @@ final class SignupCommandHandler implements CommandHandler
     {
         return $this->commandBus
             ->dispatch(
-                new CreateClientCommand(
+                new RegisterClientCommand(
                     firstName: $firstName,
                     lastName: $lastName,
                     email: $email,

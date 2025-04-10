@@ -9,7 +9,7 @@ use ApiPlatform\State\ProcessorInterface;
 use App\Common\Application\Command\CommandBus;
 use App\Common\Domain\Exception\InvalidFormat;
 use App\ClientManagement\Application\DTO\ClientDTO;
-use App\ClientManagement\Application\UseCase\CreateClient\CreateClientCommand;
+use App\ClientManagement\Application\UseCase\CreateClient\RegisterClientCommand;
 use App\ClientManagement\Domain\Exception\EmailAlreadyUsed;
 use App\ClientManagement\UserInterface\ApiPlatform\Resource\ClientResource;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
@@ -44,7 +44,7 @@ final class CreateClientProcessor implements ProcessorInterface
     {
         return $this->commandBus
             ->dispatch(
-                new CreateClientCommand(
+                new RegisterClientCommand(
                     firstName: $clientResource->firstName,
                     lastName: $clientResource->lastName,
                     email: $clientResource->email,
