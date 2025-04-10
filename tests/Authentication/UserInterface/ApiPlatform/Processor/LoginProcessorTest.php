@@ -16,41 +16,66 @@ use Webmozart\Assert\InvalidArgumentException;
 
 final class LoginProcessorTest extends TestCase
 {
+    private const VALID_EMAIL = 'test@example.com';
+    private const VALID_PASSWORD = 'password123';
+    private const VALID_TOKEN = 'token123';
+
     private $commandBus;
     private LoginProcessor $processor;
+    private Operation $operation;
 
     protected function setUp(): void
     {
         $this->commandBus = $this->createMock(CommandBus::class);
         $this->processor = new LoginProcessor($this->commandBus);
+        $this->operation = $this->createMock(Operation::class);
     }
 
-    public function testProcessValidLogin(): void
+    /**
+     * @test
+     * @group authentication
+     * @group api
+     */
+    public function should_return_jwt_token_when_login_is_valid(): void
     {
-        $email = 'test@example.com';
-        $password = 'password123';
-        $authToken = AuthTokenDTO::fromString('token123');
-        $loginPayload = new Login($email, $password);
+        // Arrange
+        $authToken = AuthTokenDTO::fromString(self::VALID_TOKEN);
+        $loginPayload = new Login(self::VALID_EMAIL, self::VALID_PASSWORD);
 
         $this->commandBus
             ->method('dispatch')
-            ->with(new LoginCommand($email, $password))
+            ->with(new LoginCommand(self::VALID_EMAIL, self::VALID_PASSWORD))
             ->willReturn($authToken);
 
-        $operation = $this->createMock(Operation::class);
+        // Act
+        $result = $this->processor->process($loginPayload, $this->operation);
 
-        $result = $this->processor->process($loginPayload, $operation);
-
-        $this->assertInstanceOf(JWT::class, $result);
-        $this->assertSame('token123', $result->token);
+        // Assert
+        $this->assertInstanceOf(
+            JWT::class, 
+            $result,
+            'Login processor should return a JWT instance'
+        );
+        $this->assertSame(
+            self::VALID_TOKEN,
+            $result->token,
+            'JWT token should match the expected token value'
+        );
     }
 
-    public function testProcessInvalidData(): void
+    /**
+     * @test
+     * @group authentication
+     * @group api
+     * @group validation
+     */
+    public function should_throw_exception_when_input_data_is_invalid(): void
     {
+        // Arrange
         $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected instance of Login. Got: string');
 
-        $operation = $this->createMock(Operation::class);
-
-        $this->processor->process('invalid_data', $operation);
+        // Act & Assert
+        $this->processor->process('invalid_data', $this->operation);
     }
 }
