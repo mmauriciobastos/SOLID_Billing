@@ -10,6 +10,6 @@ final class InvalidCredentials extends ValidationFailed
 {
     public function __construct()
     {
-        parent::__construct('Username or password are incorrect.');
+        parent::__construct('Invalid credentials provided.');
     }
 }
