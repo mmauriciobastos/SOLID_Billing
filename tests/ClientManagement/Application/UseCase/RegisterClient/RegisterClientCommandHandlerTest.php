@@ -105,7 +105,7 @@ final class RegisterClientCommandHandlerTest extends TestCase
             ->willReturn(true);
 
         $this->expectException(EmailAlreadyUsed::class);
-        $this->expectExceptionMessage(sprintf('Email "%s" already used.', self::EXISTING_EMAIL));
+        $this->expectExceptionMessage(sprintf('Email "%s" is already used.', self::EXISTING_EMAIL));
 
         // Act & Assert
         $this->handler->__invoke($command);

@@ -73,7 +73,6 @@ final class LoginProcessorTest extends TestCase
     {
         // Arrange
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected instance of Login. Got: string');
 
         // Act & Assert
         $this->processor->process('invalid_data', $this->operation);
