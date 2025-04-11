@@ -24,5 +24,7 @@ interface ClientRepository extends Repository
 
     public function emailExist(Email $email): bool;
 
+    public function save(Client $client): void;
+
     public function search(int $pageNumber, int $itemsPerPage): array;
 }

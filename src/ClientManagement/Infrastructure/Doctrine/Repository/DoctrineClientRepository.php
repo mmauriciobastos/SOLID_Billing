@@ -46,6 +46,11 @@ final class DoctrineClientRepository extends ServiceEntityRepository implements 
         return $client;
     }
 
+    public function save(Client $client): void
+    {
+        $this->getEntityManager()->persist($client);
+    }
+
     public function emailExist(Email $email): bool
     {
         $clientWithEmail = $this->findOneBy(['email' => $email]);

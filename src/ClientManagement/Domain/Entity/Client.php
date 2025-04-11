@@ -83,4 +83,14 @@ class Client extends AggregateRoot
             throw new \RuntimeException('Client is already removed !');
         }
     }
+
+    public function updateProfile(
+        Email $email,
+        FirstName $firstName,
+        LastName $lastName,
+    ): void {
+        $this->email = $email;
+        $this->firstName = $firstName;
+        $this->lastName = $lastName;
+    }
 }
