@@ -55,7 +55,7 @@ final class RegisterClientCommandHandlerTest extends TestCase
 
         $this->clientRepository
             ->expects($this->once())
-            ->method('add')
+            ->method('save')
             ->with($this->isInstanceOf(Client::class));
 
         // Act
