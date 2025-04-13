@@ -6,6 +6,6 @@ namespace App\ClientManagement\Domain\Exception;
 
 use App\Common\Domain\Exception\LogicFailed;
 
-final class NewEmailProvided extends LogicFailed
+final class DifferentEmailProvided extends LogicFailed
 {
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\ClientManagement\Application\UseCase\UpdateProfile;
 
-use App\ClientManagement\Domain\Exception\NewEmailProvided;
+use App\ClientManagement\Domain\Exception\DifferentEmailProvided;
 use App\Common\Application\Command\CommandHandler;
 use App\ClientManagement\Application\DTO\ClientDTO;
 use App\ClientManagement\Domain\Exception\ClientNotFound;
@@ -23,7 +23,7 @@ final class UpdateProfileCommandHandler implements CommandHandler
     }
 
     /**
-     * @throws ClientNotFound|NewEmailProvided
+     * @throws ClientNotFound|DifferentEmailProvided
      */
     public function __invoke(UpdateProfileCommand $command): ClientDTO
     {
@@ -36,7 +36,7 @@ final class UpdateProfileCommandHandler implements CommandHandler
 
         if ((string)$client->email() !== (string)$email)
         {
-            throw new NewEmailProvided();
+            throw new DifferentEmailProvided();
         }
 
         $client->updateProfile($firstName, $lastName);
