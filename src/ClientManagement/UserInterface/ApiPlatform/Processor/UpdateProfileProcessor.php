@@ -11,7 +11,7 @@ use App\Common\Domain\Exception\InvalidFormat;
 use App\ClientManagement\Application\DTO\ClientDTO;
 use App\ClientManagement\Application\UseCase\UpdateProfile\UpdateProfileCommand;
 use App\ClientManagement\Domain\Exception\ClientNotFound;
-use App\ClientManagement\Domain\Exception\EmailAlreadyUsed;
+use App\ClientManagement\Domain\Exception\NewEmailProvided;
 use App\ClientManagement\UserInterface\ApiPlatform\Resource\ClientResource;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -35,7 +35,7 @@ final class UpdateProfileProcessor implements ProcessorInterface
             $clientDTO = $this->updateClientAndReturnClientDTO($clientResource, $uriVariables['id']);
         } catch (ClientNotFound $exception) {
             throw new NotFoundHttpException($exception->getMessage());
-        } catch (EmailAlreadyUsed|InvalidFormat $exception) {
+        } catch (NewEmailProvided|InvalidFormat $exception) {
             throw new BadRequestException($exception->getMessage());
         }
 
@@ -44,7 +44,7 @@ final class UpdateProfileProcessor implements ProcessorInterface
 
     /**
      * @throws ClientNotFound
-     * @throws EmailAlreadyUsed
+     * @throws NewEmailProvided
      * @throws InvalidFormat
      */
     private function updateClientAndReturnClientDTO(ClientResource $clientResource, string $clientId): ClientDTO
