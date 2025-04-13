@@ -11,6 +11,7 @@ use App\ClientManagement\Domain\Entity\Client;
 use App\ClientManagement\Domain\Exception\ClientNotFound;
 use App\ClientManagement\Domain\Exception\ClientNotFoundWithId;
 use App\ClientManagement\Domain\Exception\EmailAlreadyUsed;
+use App\ClientManagement\Domain\Exception\NewEmailProvided;
 use App\ClientManagement\Domain\ValueObject\ClientId;
 use App\ClientManagement\UserInterface\ApiPlatform\Processor\UpdateProfileProcessor;
 use App\ClientManagement\UserInterface\ApiPlatform\Resource\ClientResource;
@@ -30,6 +31,7 @@ final class UpdateProfileProcessorTest extends TestCase
     private const VALID_FIRST_NAME = 'John';
     private const VALID_LAST_NAME = 'Doe';
     private const VALID_EMAIL = 'john.doe@example.com';
+    private const NEW_VALID_EMAIL = 'john.new@example.com';
     private const INVALID_CLIENT_ID = '550e8400-e29b-41d4-a716-446655440999';
     private const EXISTING_EMAIL = 'existing@example.com';
 
@@ -143,19 +145,19 @@ final class UpdateProfileProcessorTest extends TestCase
      * @group api
      * @group validation
      */
-    public function should_throw_exception_when_email_already_exists(): void
+    public function should_throw_exception_when_new_email_is_provided(): void
     {
         // Arrange
         $clientResource = new ClientResource(
             id: self::VALID_CLIENT_ID,
             firstName: self::VALID_FIRST_NAME,
             lastName: self::VALID_LAST_NAME,
-            email: self::EXISTING_EMAIL
+            email: self::NEW_VALID_EMAIL
         );
 
         $this->commandBus
             ->method('dispatch')
-            ->willThrowException(new EmailAlreadyUsed(Email::fromString(self::EXISTING_EMAIL)));
+            ->willThrowException(new NewEmailProvided());
 
         $this->expectException(BadRequestException::class);
 

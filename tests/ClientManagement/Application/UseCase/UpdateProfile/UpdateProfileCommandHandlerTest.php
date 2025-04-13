@@ -11,6 +11,7 @@ use App\ClientManagement\Domain\Entity\Client;
 use App\ClientManagement\Domain\Exception\ClientNotFound;
 use App\ClientManagement\Domain\Exception\ClientNotFoundWithId;
 use App\ClientManagement\Domain\Exception\EmailAlreadyUsed;
+use App\ClientManagement\Domain\Exception\NewEmailProvided;
 use App\ClientManagement\Domain\Repository\ClientRepository;
 use App\ClientManagement\Domain\ValueObject\ClientId;
 use App\Common\Domain\Exception\InvalidFormat;
@@ -58,7 +59,7 @@ final class UpdateProfileCommandHandlerTest extends TestCase
         // Arrange
         $command = new UpdateProfileCommand(
             clientId: self::VALID_CLIENT_ID,
-            email: self::NEW_VALID_EMAIL,
+            email: self::VALID_EMAIL,
             firstName: self::NEW_VALID_FIRST_NAME,
             lastName: self::NEW_VALID_LAST_NAME
         );
@@ -68,11 +69,6 @@ final class UpdateProfileCommandHandlerTest extends TestCase
             ->with($this->isInstanceOf(ClientId::class))
             ->willReturn($this->existingClient);
 
-        $this->clientRepository
-            ->method('emailExist')
-            ->with($this->isInstanceOf(Email::class))
-            ->willReturn(false);
-
         // Act
         $result = $this->handler->__invoke($command);
 
@@ -81,11 +77,6 @@ final class UpdateProfileCommandHandlerTest extends TestCase
             ClientDTO::class, 
             $result,
             'Handler should return a ClientDTO instance'
-        );
-        $this->assertSame(
-            self::NEW_VALID_EMAIL,
-            $result->email,
-            'Client email should be updated to the new email'
         );
         $this->assertSame(
             self::NEW_VALID_FIRST_NAME,
@@ -130,12 +121,12 @@ final class UpdateProfileCommandHandlerTest extends TestCase
      * @group profile
      * @group validation
      */
-    public function should_throw_exception_when_new_email_already_exists(): void
+    public function should_throw_exception_when_new_email_is_provided(): void
     {
         // Arrange
         $command = new UpdateProfileCommand(
             clientId: self::VALID_CLIENT_ID,
-            email: self::EXISTING_EMAIL,
+            email: self::NEW_VALID_EMAIL,
             firstName: self::NEW_VALID_FIRST_NAME,
             lastName: self::NEW_VALID_LAST_NAME
         );
@@ -144,11 +135,7 @@ final class UpdateProfileCommandHandlerTest extends TestCase
             ->method('get')
             ->willReturn($this->existingClient);
 
-        $this->clientRepository
-            ->method('emailExist')
-            ->willReturn(true);
-
-        $this->expectException(EmailAlreadyUsed::class);
+        $this->expectException(NewEmailProvided::class);
 
         // Act & Assert
         $this->handler->__invoke($command);
