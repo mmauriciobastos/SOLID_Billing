@@ -11,7 +11,7 @@ use App\ClientManagement\Domain\Entity\Client;
 use App\ClientManagement\Domain\Exception\ClientNotFound;
 use App\ClientManagement\Domain\Exception\ClientNotFoundWithId;
 use App\ClientManagement\Domain\Exception\EmailAlreadyUsed;
-use App\ClientManagement\Domain\Exception\NewEmailProvided;
+use App\ClientManagement\Domain\Exception\DifferentEmailProvided;
 use App\ClientManagement\Domain\ValueObject\ClientId;
 use App\ClientManagement\UserInterface\ApiPlatform\Processor\UpdateProfileProcessor;
 use App\ClientManagement\UserInterface\ApiPlatform\Resource\ClientResource;
@@ -145,7 +145,7 @@ final class UpdateProfileProcessorTest extends TestCase
      * @group api
      * @group validation
      */
-    public function should_throw_exception_when_new_email_is_provided(): void
+    public function should_throw_exception_when_different_email_is_provided(): void
     {
         // Arrange
         $clientResource = new ClientResource(
@@ -157,7 +157,7 @@ final class UpdateProfileProcessorTest extends TestCase
 
         $this->commandBus
             ->method('dispatch')
-            ->willThrowException(new NewEmailProvided());
+            ->willThrowException(new DifferentEmailProvided());
 
         $this->expectException(BadRequestException::class);
 

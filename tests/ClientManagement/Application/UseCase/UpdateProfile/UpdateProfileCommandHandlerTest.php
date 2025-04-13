@@ -11,7 +11,7 @@ use App\ClientManagement\Domain\Entity\Client;
 use App\ClientManagement\Domain\Exception\ClientNotFound;
 use App\ClientManagement\Domain\Exception\ClientNotFoundWithId;
 use App\ClientManagement\Domain\Exception\EmailAlreadyUsed;
-use App\ClientManagement\Domain\Exception\NewEmailProvided;
+use App\ClientManagement\Domain\Exception\DifferentEmailProvided;
 use App\ClientManagement\Domain\Repository\ClientRepository;
 use App\ClientManagement\Domain\ValueObject\ClientId;
 use App\Common\Domain\Exception\InvalidFormat;
@@ -121,7 +121,7 @@ final class UpdateProfileCommandHandlerTest extends TestCase
      * @group profile
      * @group validation
      */
-    public function should_throw_exception_when_new_email_is_provided(): void
+    public function should_throw_exception_when_different_email_is_provided(): void
     {
         // Arrange
         $command = new UpdateProfileCommand(
@@ -135,7 +135,7 @@ final class UpdateProfileCommandHandlerTest extends TestCase
             ->method('get')
             ->willReturn($this->existingClient);
 
-        $this->expectException(NewEmailProvided::class);
+        $this->expectException(DifferentEmailProvided::class);
 
         // Act & Assert
         $this->handler->__invoke($command);
