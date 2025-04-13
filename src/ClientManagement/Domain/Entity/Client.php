@@ -85,11 +85,9 @@ class Client extends AggregateRoot
     }
 
     public function updateProfile(
-        Email $email,
         FirstName $firstName,
         LastName $lastName,
     ): void {
-        $this->email = $email;
         $this->firstName = $firstName;
         $this->lastName = $lastName;
     }

@@ -39,7 +39,7 @@ final class UpdateProfileCommandHandler implements CommandHandler
             throw new EmailAlreadyUsed($email);
         }
 
-        $client->updateProfile($email, $firstName, $lastName);
+        $client->updateProfile($firstName, $lastName);
         $this->clientRepository->save($client);
 
         return ClientDTO::fromEntity($client);
