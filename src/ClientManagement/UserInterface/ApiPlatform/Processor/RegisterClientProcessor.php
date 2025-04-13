@@ -15,7 +15,7 @@ use App\ClientManagement\UserInterface\ApiPlatform\Resource\ClientResource;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Webmozart\Assert\Assert;
 
-final class CreateClientProcessor implements ProcessorInterface
+final class RegisterClientProcessor implements ProcessorInterface
 {
     public function __construct(
         private readonly CommandBus $commandBus,
@@ -29,7 +29,7 @@ final class CreateClientProcessor implements ProcessorInterface
         $clientResource = $data;
 
         try {
-            $clientDTO = $this->createClientAndReturnClientDTO($clientResource);
+            $clientDTO = $this->registerClientAndReturnClientDTO($clientResource);
         } catch (EmailAlreadyUsed|InvalidFormat $exception) {
             throw new BadRequestException($exception->getMessage());
         }
@@ -40,7 +40,7 @@ final class CreateClientProcessor implements ProcessorInterface
     /**
      * @throws EmailAlreadyUsed|InvalidFormat
      */
-    private function createClientAndReturnClientDTO(ClientResource $clientResource): ClientDTO
+    private function registerClientAndReturnClientDTO(ClientResource $clientResource): ClientDTO
     {
         return $this->commandBus
             ->dispatch(

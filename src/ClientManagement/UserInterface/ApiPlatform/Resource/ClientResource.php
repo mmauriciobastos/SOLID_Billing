@@ -8,10 +8,11 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\ClientManagement\Application\DTO\ClientDTO;
-use App\ClientManagement\UserInterface\ApiPlatform\Processor\CreateClientProcessor;
+use App\ClientManagement\UserInterface\ApiPlatform\Processor\RegisterClientProcessor;
 use App\ClientManagement\UserInterface\ApiPlatform\Processor\UpdateProfileProcessor;
 use App\ClientManagement\UserInterface\ApiPlatform\Provider\ClientProvider;
 use App\ClientManagement\UserInterface\ApiPlatform\Provider\ClientsProvider;
@@ -30,15 +31,16 @@ use Symfony\Component\Validator\Constraints as Assert;
             provider: ClientProvider::class,
         ),
         new Post(
-            extraProperties: ['openapi_context' => ['summary' => 'Create client']],
-            denormalizationContext: ['groups' => ['create']],
-            validationContext: ['groups' => ['create']],
-            processor: CreateClientProcessor::class,
+            extraProperties: ['openapi_context' => ['summary' => 'Register client']],
+            denormalizationContext: ['groups' => ['register']],
+            validationContext: ['groups' => ['register']],
+            processor: RegisterClientProcessor::class,
         ),
         new Put(
             extraProperties: ['openapi_context' => ['summary' => 'Update client']],
             denormalizationContext: ['groups' => ['update']],
             validationContext: ['groups' => ['update']],
+            provider: ClientProvider::class,
             processor: UpdateProfileProcessor::class,
         ),
     ],
@@ -51,19 +53,19 @@ final class ClientResource
         public readonly string $id = '',
 
         #[Assert\Length(min: 1, max: 255)]
-        #[Assert\NotNull(groups: ['register', 'create', 'update'])]
-        #[Groups(groups: ['read', 'create', 'update'])]
+        #[Assert\NotNull(groups: ['register'])]
+        #[Groups(groups: ['read', 'register', 'update'])]
         public readonly string $firstName = '',
 
         #[Assert\Length(min: 1, max: 255)]
-        #[Assert\NotNull(groups: ['register', 'create', 'update'])]
-        #[Groups(groups: ['read', 'create', 'update'])]
+        #[Assert\NotNull(groups: ['register'])]
+        #[Groups(groups: ['read', 'register', 'update'])]
         public readonly string $lastName = '',
 
         #[Assert\Length(min: 1, max: 255)]
         #[Assert\Email]
-        #[Assert\NotNull(groups: ['register', 'create', 'update'])]
-        #[Groups(groups: ['read', 'create', 'update'])]
+        #[Assert\NotNull(groups: ['register'])]
+        #[Groups(groups: ['read', 'register', 'update'])]
         public readonly string $email = '',
     ) {
     }
