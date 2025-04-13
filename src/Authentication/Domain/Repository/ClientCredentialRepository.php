@@ -11,5 +11,5 @@ interface ClientCredentialRepository
 {
     public function getByUsername(Username $username): ClientCredential;
 
-    public function add(ClientCredential $clientCredential): void;
+    public function save(ClientCredential $clientCredential): void;
 }

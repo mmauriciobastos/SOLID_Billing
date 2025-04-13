@@ -35,7 +35,7 @@ final class RegisterClientCommandHandler implements CommandHandler
             email: $email,
         );
 
-        $this->clientRepository->add($client);
+        $this->clientRepository->save($client);
 
         return ClientDTO::fromEntity($client);
     }

@@ -27,7 +27,7 @@ final class DoctrineClientRepository extends ServiceEntityRepository implements 
         parent::__construct($registry, Client::class);
     }
 
-    public function add(Client $client): void
+    public function save(Client $client): void
     {
         $this->getEntityManager()->persist($client);
     }
@@ -44,11 +44,6 @@ final class DoctrineClientRepository extends ServiceEntityRepository implements 
         }
 
         return $client;
-    }
-
-    public function save(Client $client): void
-    {
-        $this->getEntityManager()->persist($client);
     }
 
     public function emailExist(Email $email): bool

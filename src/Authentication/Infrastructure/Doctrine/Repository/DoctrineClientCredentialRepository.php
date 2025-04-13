@@ -41,7 +41,7 @@ final class DoctrineClientCredentialRepository extends ServiceEntityRepository i
         return $clientCredential;
     }
 
-    public function add(ClientCredential $clientCredential): void
+    public function save(ClientCredential $clientCredential): void
     {
         $this->getEntityManager()->persist($clientCredential);
     }

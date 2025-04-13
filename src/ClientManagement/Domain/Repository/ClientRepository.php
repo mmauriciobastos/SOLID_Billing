@@ -15,7 +15,7 @@ use App\ClientManagement\Domain\ValueObject\ClientId;
  */
 interface ClientRepository extends Repository
 {
-    public function add(Client $client): void;
+    public function save(Client $client): void;
 
     /**
      * @throws ClientNotFound
@@ -23,8 +23,6 @@ interface ClientRepository extends Repository
     public function get(ClientId $id): Client;
 
     public function emailExist(Email $email): bool;
-
-    public function save(Client $client): void;
 
     public function search(int $pageNumber, int $itemsPerPage): array;
 }
