@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\ClientManagement\Application\UseCase\RegisterClient;
 
+use App\Authentication\Domain\Event\ClientHasBeenRegistered;
 use App\Common\Application\Command\CommandHandler;
+use App\Common\Application\Event\EventBus;
 use App\Common\Domain\Exception\InvalidFormat;
 use App\Common\Domain\ValueObject\Email;
 use App\Common\Domain\ValueObject\FirstName;
@@ -18,6 +20,7 @@ final class RegisterClientCommandHandler implements CommandHandler
 {
     public function __construct(
         private readonly ClientRepository $clientRepository,
+        private readonly EventBus $eventBus,
     ) {
     }
 
@@ -36,6 +39,10 @@ final class RegisterClientCommandHandler implements CommandHandler
         );
 
         $this->clientRepository->save($client);
+
+        $this->eventBus->dispatch(
+            ClientHasBeenRegistered::withClientId((string) $client->id())
+        );
 
         return ClientDTO::fromEntity($client);
     }

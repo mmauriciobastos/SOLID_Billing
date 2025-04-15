@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Authentication\Domain\Event;
 
 use App\Common\Domain\Event\DomainEvent;
+use App\ClientManagement\Domain\ValueObject\ClientId;
 
 final class ClientHasBeenRegistered extends DomainEvent
 {
@@ -13,5 +14,17 @@ final class ClientHasBeenRegistered extends DomainEvent
     public static function eventName(): string
     {
         return self::EVENT_NAME;
+    }
+
+    public static function withClientId(string $clientId): self
+    {
+        return self::create(
+            ClientId::fromString($clientId)
+        );
+    }
+
+    public function clientId(): string
+    {
+        return (string) $this->aggregateRootId();
     }
 }

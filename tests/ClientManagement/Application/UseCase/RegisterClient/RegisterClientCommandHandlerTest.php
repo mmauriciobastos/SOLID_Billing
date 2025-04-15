@@ -4,16 +4,19 @@ declare(strict_types=1);
 
 namespace Tests\ClientManagement\Application\UseCase\RegisterClient;
 
+use App\Authentication\Domain\Event\ClientHasBeenRegistered;
 use App\ClientManagement\Application\DTO\ClientDTO;
 use App\ClientManagement\Application\UseCase\RegisterClient\RegisterClientCommand;
 use App\ClientManagement\Application\UseCase\RegisterClient\RegisterClientCommandHandler;
 use App\ClientManagement\Domain\Entity\Client;
 use App\ClientManagement\Domain\Exception\EmailAlreadyUsed;
 use App\ClientManagement\Domain\Repository\ClientRepository;
+use App\Common\Application\Event\EventBus;
 use App\Common\Domain\Exception\InvalidFormat;
 use App\Common\Domain\ValueObject\Email;
 use App\Common\Domain\ValueObject\FirstName;
 use App\Common\Domain\ValueObject\LastName;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 final class RegisterClientCommandHandlerTest extends TestCase
@@ -24,13 +27,18 @@ final class RegisterClientCommandHandlerTest extends TestCase
     private const INVALID_EMAIL = 'invalid-email';
     private const EXISTING_EMAIL = 'existing@example.com';
 
-    private $clientRepository;
+    private ClientRepository|MockObject $clientRepository;
+    private EventBus|MockObject $eventBus;
     private RegisterClientCommandHandler $handler;
 
     protected function setUp(): void
     {
         $this->clientRepository = $this->createMock(ClientRepository::class);
-        $this->handler = new RegisterClientCommandHandler($this->clientRepository);
+        $this->eventBus = $this->createMock(EventBus::class);
+        $this->handler = new RegisterClientCommandHandler(
+            $this->clientRepository,
+            $this->eventBus
+        );
     }
 
     /**
@@ -57,6 +65,11 @@ final class RegisterClientCommandHandlerTest extends TestCase
             ->expects($this->once())
             ->method('save')
             ->with($this->isInstanceOf(Client::class));
+
+        $this->eventBus
+            ->expects($this->once())
+            ->method('dispatch')
+            ->with($this->isInstanceOf(ClientHasBeenRegistered::class));
 
         // Act
         $result = $this->handler->__invoke($command);

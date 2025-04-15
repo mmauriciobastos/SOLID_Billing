@@ -5,6 +5,7 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     .container.dumper.inline_factories: true
+    app.email.from_address: 'no-reply@example.com'
 
 services:
     # default configuration for services in *this* file
@@ -14,6 +15,7 @@ services:
         bind:
             'string $jwtPrivateKey': '%env(resolve:JWT_PRIVATE_KEY)%'
             'string $jwtPublicKey': '%env(resolve:JWT_PUBLIC_KEY)%'
+            'string $emailFrom': '%app.email.from_address%'
 
     _instanceof:
 
@@ -25,6 +27,10 @@ services:
         App\Common\Application\Command\CommandHandler:
             tags:
                 - { name: 'messenger.message_handler', bus: 'command.bus' }
+
+        App\Common\Domain\Event\DomainEventSubscriber:
+            tags:
+                - { name: 'domain.event_subscriber', bus: 'event.bus' }
 
     # Common
     App\Common\:
@@ -44,5 +50,6 @@ services:
     App\Messaging\:
         resource: '%kernel.project_dir%/src/Messaging/'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    # Email Service
+    App\ClientManagement\Domain\Service\EmailService:
+        class: App\ClientManagement\Infrastructure\Service\SymfonyEmailService
