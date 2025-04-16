@@ -5,7 +5,6 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     .container.dumper.inline_factories: true
-    app.email.from_address: 'no-reply@example.com'
 
 services:
     # default configuration for services in *this* file
@@ -15,7 +14,6 @@ services:
         bind:
             'string $jwtPrivateKey': '%env(resolve:JWT_PRIVATE_KEY)%'
             'string $jwtPublicKey': '%env(resolve:JWT_PUBLIC_KEY)%'
-            'string $emailFrom': '%app.email.from_address%'
 
     _instanceof:
 
@@ -28,9 +26,8 @@ services:
             tags:
                 - { name: 'messenger.message_handler', bus: 'command.bus' }
 
-        App\Common\Domain\Event\DomainEventSubscriber:
-            tags:
-                - { name: 'domain.event_subscriber', bus: 'event.bus' }
+        # App\Common\Domain\Event\DomainEventSubscriber:
+            # tags: [ 'domain.event_subscriber' ]
 
     # Common
     App\Common\:
@@ -45,11 +42,21 @@ services:
     # ClientManagement
     App\ClientManagement\:
         resource: '%kernel.project_dir%/src/ClientManagement/'
+        # exclude:
+        #     - '%kernel.project_dir%/src/ClientManagement/Infrastructure/Event/'
 
     # Messaging
     App\Messaging\:
         resource: '%kernel.project_dir%/src/Messaging/'
 
+    # Domain Event
+    # App\ClientManagement\Infrastructure\Event\:
+    #     resource: '%kernel.project_dir%/src/ClientManagement/Infrastructure/Event/'
+    #     tags: [ 'domain.event_subscriber' ]
+
     # Email Service
     App\ClientManagement\Domain\Service\EmailService:
         class: App\ClientManagement\Infrastructure\Service\SymfonyEmailService
+        arguments:
+            $senderEmail: '%env(MAILER_FROM_ADDRESS)%'
+

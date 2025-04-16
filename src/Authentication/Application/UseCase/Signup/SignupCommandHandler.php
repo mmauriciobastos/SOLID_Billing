@@ -13,10 +13,8 @@ use App\Authentication\Domain\Repository\ClientCredentialRepository;
 use App\Authentication\Domain\Service\PasswordHasher;
 use App\Authentication\Domain\ValueObject\Password;
 use App\Authentication\Domain\ValueObject\Username;
-use App\Authentication\Domain\Event\ClientHasBeenRegistered;
 use App\Common\Application\Command\CommandBus;
 use App\Common\Application\Command\CommandHandler;
-use App\Common\Application\Event\EventBus;
 use App\ClientManagement\Application\DTO\ClientDTO;
 use App\ClientManagement\Application\UseCase\RegisterClient\RegisterClientCommand;
 use App\ClientManagement\Domain\ValueObject\ClientId;
@@ -28,7 +26,6 @@ final class SignupCommandHandler implements CommandHandler
         private readonly PasswordHasher $passwordHasher,
         private readonly ClientCredentialRepository $clientCredentialRepository,
         private readonly AuthTokenCreator $authTokenCreator,
-        private readonly EventBus $eventBus
     ) {
     }
 
@@ -54,10 +51,6 @@ final class SignupCommandHandler implements CommandHandler
         );
 
         $this->clientCredentialRepository->save($clientCredential);
-
-        $this->eventBus->dispatch(
-            ClientHasBeenRegistered::withClientId((string) $clientDTO->id)
-        );
 
         return $this->authTokenCreator->createFromClientDTO($clientDTO);
     }

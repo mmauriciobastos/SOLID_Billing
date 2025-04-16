@@ -10,6 +10,7 @@ use App\Common\Domain\ValueObject\Email;
 use App\Common\Domain\ValueObject\FirstName;
 use App\Common\Domain\ValueObject\LastName;
 use App\ClientManagement\Domain\ValueObject\ClientId;
+use App\ClientManagement\Domain\Event\ClientHasBeenRegisteredEvent;
 
 class Client extends AggregateRoot
 {
@@ -33,11 +34,19 @@ class Client extends AggregateRoot
         LastName $lastName,
         Email $email,
     ): Client {
-        return new self(
+        $client = new self(
             $firstName,
             $lastName,
             $email,
         );
+
+        $client->record(
+            ClientHasBeenRegisteredEvent::create(
+                $client->id()
+            )
+        );
+        
+        return $client;
     }
 
     public function id(): ClientId

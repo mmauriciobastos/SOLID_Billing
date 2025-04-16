@@ -14,22 +14,17 @@ final class SymfonyEmailService implements EmailService
     public function __construct(
         private readonly MailerInterface $mailer,
         private readonly LoggerInterface $logger,
-        private readonly string $emailFrom,
+        private readonly string $senderEmail,
     ) {
     }
 
     public function sendWelcomeEmail(string $to, string $firstName): void
     {
         $email = (new Email())
-            ->from($this->emailFrom)
+            ->from($this->senderEmail)
             ->to($to)
             ->subject('Welcome to Our Service!')
-            ->html(sprintf(
-                '<h1>Welcome, %s!</h1>
-                <p>Thank you for registering with our service. We are excited to have you on board!</p>
-                <p>Best regards,<br>The Team</p>',
-                htmlspecialchars($firstName)
-            ));
+            ->html($this->createWelcomeEmailContent($firstName));
 
         try {
             $this->mailer->send($email);
@@ -42,5 +37,15 @@ final class SymfonyEmailService implements EmailService
                 $exception->getMessage()
             ));
         }
+    }
+
+    private function createWelcomeEmailContent(string $firstName): string
+    {
+        return sprintf(
+            '<h1>Welcome, %s!</h1>
+                <p>Thank you for registering with our service. We are excited to have you on board!</p>
+                <p>Best regards,<br>The Team</p>',
+            htmlspecialchars($firstName)
+        );
     }
 }

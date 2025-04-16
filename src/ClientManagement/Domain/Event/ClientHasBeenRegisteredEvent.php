@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Authentication\Domain\Event;
+namespace App\ClientManagement\Domain\Event;
 
 use App\Common\Domain\Event\DomainEvent;
 use App\ClientManagement\Domain\ValueObject\ClientId;
 
-final class ClientHasBeenRegistered extends DomainEvent
+final class ClientHasBeenRegisteredEvent extends DomainEvent
 {
     public const EVENT_NAME = 'authentication.client_has_been_registered';
 

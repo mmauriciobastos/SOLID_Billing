@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\ClientManagement\Infrastructure\Event;
+namespace App\ClientManagement\Application\EventHandler;
 
-use App\Authentication\Domain\Event\ClientHasBeenRegistered;
-use App\ClientManagement\Domain\Service\EmailService;
-use App\Common\Domain\Event\DomainEventSubscriber;
-use App\Common\Application\Query\QueryBus;
 use App\ClientManagement\Application\UseCase\GetClientById\GetClientByIdQuery;
+use App\ClientManagement\Domain\Event\ClientHasBeenRegisteredEvent;
+use App\ClientManagement\Domain\Event\ClientHasBeenRegisteredEventHandler;
+use App\ClientManagement\Domain\Service\EmailService;
+use App\Common\Application\Query\QueryBus;
+use App\Common\Domain\Event\DomainEvent;
 
-final class SendWelcomeEmailWhenClientRegisteredSubscriber implements DomainEventSubscriber
+final class WelcomeEmailSender implements ClientHasBeenRegisteredEventHandler
 {
     public function __construct(
         private readonly EmailService $emailService,
@@ -18,13 +19,12 @@ final class SendWelcomeEmailWhenClientRegisteredSubscriber implements DomainEven
     ) {
     }
 
-    public static function subscribedTo(): array
+    public function handle(DomainEvent $event): void
     {
-        return [ClientHasBeenRegistered::class];
-    }
+        if (!$event instanceof ClientHasBeenRegisteredEvent) {
+            return;
+        }
 
-    public function __invoke(ClientHasBeenRegistered $event): void
-    {
         $clientDTO = $this->queryBus->ask(
             new GetClientByIdQuery($event->clientId())
         );
