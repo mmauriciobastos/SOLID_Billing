@@ -6,12 +6,12 @@ namespace App\ClientManagement\Application\EventHandler;
 
 use App\ClientManagement\Application\UseCase\GetClientById\GetClientByIdQuery;
 use App\ClientManagement\Domain\Event\ClientHasBeenRegisteredEvent;
-use App\ClientManagement\Domain\Event\ClientHasBeenRegisteredEventHandler;
 use App\ClientManagement\Domain\Service\EmailService;
 use App\Common\Application\Query\QueryBus;
 use App\Common\Domain\Event\DomainEvent;
+use App\Common\Domain\Event\DomainEventSubscriber;
 
-final class WelcomeEmailSender implements ClientHasBeenRegisteredEventHandler
+final class SendWelcomeEmailHandler implements DomainEventSubscriber
 {
     public function __construct(
         private readonly EmailService $emailService,
@@ -19,7 +19,7 @@ final class WelcomeEmailSender implements ClientHasBeenRegisteredEventHandler
     ) {
     }
 
-    public function handle(DomainEvent $event): void
+    public function __invoke(DomainEvent $event): void
     {
         if (!$event instanceof ClientHasBeenRegisteredEvent) {
             return;
@@ -37,5 +37,12 @@ final class WelcomeEmailSender implements ClientHasBeenRegisteredEventHandler
             to: $clientDTO->email,
             firstName: $clientDTO->firstName
         );
+    }
+
+    public static function subscribedTo(): array
+    {
+        return [
+            ClientHasBeenRegisteredEvent::class
+        ];
     }
 }

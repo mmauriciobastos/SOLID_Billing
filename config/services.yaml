@@ -56,7 +56,10 @@ services:
 
     # Email Service
     App\ClientManagement\Domain\Service\EmailService:
-        class: App\ClientManagement\Infrastructure\Service\SymfonyEmailService
+        class: App\ClientManagement\Infrastructure\Symfony\Service\SymfonyEmailService
         arguments:
             $senderEmail: '%env(MAILER_FROM_ADDRESS)%'
 
+    App\ClientManagement\Application\EventHandler\:
+        resource: '%kernel.project_dir%/src/ClientManagement/Application/EventHandler/*'
+        tags: ['domain.event.handler']

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\ClientManagement\Infrastructure\Service;
+namespace App\ClientManagement\Infrastructure\Symfony\Service;
 
 use App\ClientManagement\Domain\Service\EmailService;
 use Psr\Log\LoggerInterface;

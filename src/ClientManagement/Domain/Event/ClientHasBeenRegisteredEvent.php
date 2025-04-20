@@ -9,7 +9,7 @@ use App\ClientManagement\Domain\ValueObject\ClientId;
 
 final class ClientHasBeenRegisteredEvent extends DomainEvent
 {
-    public const EVENT_NAME = 'authentication.client_has_been_registered';
+    public const EVENT_NAME = 'client_management.client_has_been_registered';
 
     public static function eventName(): string
     {
