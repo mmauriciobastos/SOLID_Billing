@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\ClientManagement\Infrastructure\Service;
+namespace Tests\ClientManagement\Infrastructure\Symfony\Service;
 
-use App\ClientManagement\Infrastructure\Service\SymfonyEmailService;
+use App\ClientManagement\Infrastructure\Symfony\Service\SymfonyEmailService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;

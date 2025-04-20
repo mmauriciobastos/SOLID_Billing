@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\ClientManagement\Application\UseCase\RegisterClient;
 
-use App\Authentication\Domain\Event\ClientHasBeenRegistered;
 use App\ClientManagement\Application\DTO\ClientDTO;
 use App\ClientManagement\Application\UseCase\RegisterClient\RegisterClientCommand;
 use App\ClientManagement\Application\UseCase\RegisterClient\RegisterClientCommandHandler;
 use App\ClientManagement\Domain\Entity\Client;
+use App\ClientManagement\Domain\Event\ClientHasBeenRegisteredEvent;
 use App\ClientManagement\Domain\Exception\EmailAlreadyUsed;
 use App\ClientManagement\Domain\Repository\ClientRepository;
-use App\Common\Application\Event\EventBus;
+use App\Common\Domain\Event\EventBus;
 use App\Common\Domain\Exception\InvalidFormat;
 use App\Common\Domain\ValueObject\Email;
 use App\Common\Domain\ValueObject\FirstName;
@@ -68,8 +68,8 @@ final class RegisterClientCommandHandlerTest extends TestCase
 
         $this->eventBus
             ->expects($this->once())
-            ->method('dispatch')
-            ->with($this->isInstanceOf(ClientHasBeenRegistered::class));
+            ->method('publish')
+            ->with($this->isInstanceOf(ClientHasBeenRegisteredEvent::class));
 
         // Act
         $result = $this->handler->__invoke($command);
