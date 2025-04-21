@@ -50,7 +50,7 @@ final class SignupCommandHandler implements CommandHandler
             hashedPassword: $this->passwordHasher->hash(Password::fromString($command->password)),
         );
 
-        $this->clientCredentialRepository->add($clientCredential);
+        $this->clientCredentialRepository->save($clientCredential);
 
         return $this->authTokenCreator->createFromClientDTO($clientDTO);
     }

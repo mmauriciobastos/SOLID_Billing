@@ -26,6 +26,9 @@ services:
             tags:
                 - { name: 'messenger.message_handler', bus: 'command.bus' }
 
+        # App\Common\Domain\Event\DomainEventSubscriber:
+            # tags: [ 'domain.event_subscriber' ]
+
     # Common
     App\Common\:
         resource: '%kernel.project_dir%/src/Common/'
@@ -39,10 +42,24 @@ services:
     # ClientManagement
     App\ClientManagement\:
         resource: '%kernel.project_dir%/src/ClientManagement/'
+        # exclude:
+        #     - '%kernel.project_dir%/src/ClientManagement/Infrastructure/Event/'
 
     # Messaging
     App\Messaging\:
         resource: '%kernel.project_dir%/src/Messaging/'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    # Domain Event
+    # App\ClientManagement\Infrastructure\Event\:
+    #     resource: '%kernel.project_dir%/src/ClientManagement/Infrastructure/Event/'
+    #     tags: [ 'domain.event_subscriber' ]
+
+    # Email Service
+    App\ClientManagement\Domain\Service\EmailService:
+        class: App\ClientManagement\Infrastructure\Symfony\Service\SymfonyEmailService
+        arguments:
+            $senderEmail: '%env(MAILER_FROM_ADDRESS)%'
+
+    App\ClientManagement\Application\EventHandler\:
+        resource: '%kernel.project_dir%/src/ClientManagement/Application/EventHandler/*'
+        tags: ['domain.event.handler']
